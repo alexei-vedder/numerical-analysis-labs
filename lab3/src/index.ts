@@ -45,33 +45,6 @@ enum FuncFindingType {
     'newton'
 }
 
-/*
-function initBisection() {
-    const leftBorder = document.getElementsByClassName("input-left")[0].value;
-    const rightBorder = document.getElementsByClassName("input-right")[0].value;
-
-    const bisectionMethod = solveByBisectionMethod(Number.parseFloat(leftBorder), Number.parseFloat(rightBorder));
-
-    document.getElementById("bisection-solution").innerHTML = bisectionMethod["solution"].toFixed(6).toString();
-    document.getElementById("bisection-error").innerHTML = bisectionMethod["error"].toString();
-    document.getElementById("bisection-iterations-total").innerHTML = bisectionMethod["iterations-total"].toString();
-}
-
-function initNewton() {
-    const x0 = document.getElementsByClassName("input-x0")[0].value;
-
-    const newtonMethod = solveByNewtonMethod(Number.parseFloat(x0));
-
-    document.getElementById("newton-solution").innerHTML = newtonMethod["solution"].toFixed(6).toString();
-    document.getElementById("newton-error").innerHTML = newtonMethod["error"].toString();
-    document.getElementById("newton-iterations-total").innerHTML = newtonMethod["iterations-total"].toString();
-}
-const initBisectionButton = document.getElementsByClassName("init-bisection-button")[0];
-initBisectionButton.addEventListener('click', initBisection);
-
-const initNewtonButton = document.getElementsByClassName("init-newton-button")[0];
-initNewtonButton.addEventListener('click', initNewton);*/
-
 function pushToOutput(...records: any[]): void {
     records.map((elem) => elem.toString());
     setTimeout(() => {
@@ -226,6 +199,7 @@ function getNValuableRange(tabFunc: TabulatedFunction, epsilon: number, partitio
     return [errorTabFunc.nodes[0], errorTabFunc.nodes[errorTabFunc.nodes.length - 1]];
 }
 
+// main function
 (() => {
     const leftBorder: number = 0;
     const rightBorder: number = 3.5;
