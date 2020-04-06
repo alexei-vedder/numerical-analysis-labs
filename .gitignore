@@ -1,0 +1,33 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+/lab3/dist
+/build
+
+# IDEs and editors
+/.idea
+*.iml
+/*.iml
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+testem.log
+/typings
+
+# System Files
+.DS_Store
+Thumbs.db
+
+/node_modules/
+*/package-lock.json
+/lab3/package-lock.json
+/lab2/package-lock.json
+/lab1/package-lock.json
