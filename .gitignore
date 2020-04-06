@@ -27,7 +27,12 @@ testem.log
 Thumbs.db
 
 /node_modules/
-*/package-lock.json
+*/*/package-lock.json
 /lab3/package-lock.json
 /lab2/package-lock.json
 /lab1/package-lock.json
+/lab1/node_modules/
+/lab2/node_modules/
+/lab3/node_modules/
+/lab3/build/
+/lab3/dist/
