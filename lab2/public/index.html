@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--
+  This HTML file is a template.
+  If you open it directly in the browser, you will see an empty page.
+
+  You can add webfonts, meta tags, or analytics to this file.
+  The build step will place the bundled scripts into the <body> tag.
+
+  To begin the development, run `npm start` or `yarn start`.
+  To create a production bundle, use `npm run build` or `yarn build`.
+-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="theme-color" content="#000000">
+    <link rel="stylesheet" type="text/css" href="index.css">
+    <title>lab2</title>
+</head>
+<body>
+    <noscript>
+    You need to enable JavaScript to run this app.
+</noscript>
+    <div class="root">
+        <div class="plot"></div>
+        <div class="input-output">
+            <form class="input">
+                <label>x<sub>0</sub>
+                    <input type="number" value="0" step="0.1" class="input-x0"/>
+                </label>
+
+                <label>y<sub>0</sub>
+                    <input type="number" value="0" step="0.1" class="input-y0"/>
+                </label>
+
+                <button type="button" class="init-calculating-button">enter</button>
+            </form>
+
+
+            <section class="output">
+                <div class="output__elem">Newton solution:<br>
+                    <label class="_bold-font _large-font" id="newton-solution"></label>
+                </div>
+                <div class="output__elem">iterations total:<br>
+                    <label class="_bold-font _large-font" id="newton-iterations-total"></label>
+                </div>
+                <div class="output__elem">error:<br>
+                    <label class="_bold-font" id="newton-error"></label>
+                </div>
+            </section>
+
+            <section class="output">
+                <div class="output__elem">Modified Newton solution:<br>
+                    <label class="_bold-font _large-font" id="mod-newton-solution"></label>
+                </div>
+                <div class="output__elem">iterations total:<br>
+                    <label class="_bold-font _large-font" id="mod-newton-iterations-total"></label>
+                </div>
+                <div class="output__elem">error:<br>
+                    <label class="_bold-font" id="mod-newton-error"></label>
+                </div>
+            </section>
+        </div>
+    </div>
+</body>
+</html>
