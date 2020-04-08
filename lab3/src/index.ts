@@ -214,32 +214,26 @@ function getNValuableRange(tabFunc: TabulatedFunction, epsilon: number, partitio
     pushToOutput("Lagrange solution:", lagrangeSolution);
     pushToOutput("Newton solution:", newtonSolution);
 
-    justFuncPlot(plotOptions(
-        "function",
-        plotElem("just-func-plot"),
-        {
-            // @ts-ignore
-            fn: simplify(func, {pi: pi}).toString(),
-            range: [leftBorder, rightBorder]
-        }
-    ));
-
-    fourthDerFuncPlot(plotOptions(
+    /*fourthDerFuncPlot(plotOptions(
         "4th derivation",
         plotElem("fourth-der-func-plot"),
         {
             fn: fourthDerivation,
             range: [leftBorder, rightBorder]
         }
-    ));
+    ));*/
 
     calculatePolynomial(tabulatedFunction)
         .forEach((element, index) => pushToOutput("Lagrange polynomial (", index, ")", element));
 
     lagrangeAndNewtonFuncPlot(plotOptions(
-        "Lagrange and Newton",
+        "function, Lagrange and Newton",
         plotElem("lagrange-and-newton-func-plot"),
         {
+            // @ts-ignore
+            fn: simplify(func, {pi: pi}).toString(),
+            range: [leftBorder, rightBorder]
+        }, {
             graphType: 'polyline',
             // @ts-ignore
             fn: scope => interpolateLagrange(tabulatedFunction, scope.x),
@@ -257,14 +251,14 @@ function getNValuableRange(tabFunc: TabulatedFunction, epsilon: number, partitio
     pushToOutput("Newton error:", calculateError(tabulatedFunction, x, FuncFindingType.newton));
 
     errorFuncPlot(plotOptions(
-        "Error",
+        "Errors",
         plotElem("error-func-plot"),
-        /*{
+        {
             graphType: 'polyline',
             // @ts-ignore
             fn: scope => calculateError(tabulatedFunction, scope.x, FuncFindingType.standard),
             range: [leftBorder, rightBorder]
-        }, */{
+        }, {
             graphType: 'polyline',
             // @ts-ignore
             fn: scope => calculateError(tabulatedFunction, scope.x, FuncFindingType.lagrange),
