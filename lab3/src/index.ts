@@ -20,12 +20,14 @@ const plotElem = (id: string) => {
     return document.getElementById(id);
 };
 
-const plotOptions = (title: string, target: HTMLElement | null, ...data: Object[]) => {
+const plotOptions = (title: string, target: HTMLElement | null, xAxis: {}, yAxis: {}, ...data: Object[]) => {
     return {
         title: title,
         width: 400,
         height: 270,
         target: target,
+        xAxis: xAxis,
+        yAxis: yAxis,
         tip: {
             renderer: () => {}
         },
@@ -54,15 +56,15 @@ function pushToOutput(...records: any[]): void {
     }, 2000);
 }
 
-function tabulateFunction(func: string, a: number, b: number, partition: number): TabulatedFunction {
-    if (b < a) {
-        b = [a, a = b][0]; // swap
+function tabulateFunction(func: string, from: number, to: number, partition: number): TabulatedFunction {
+    if (to < from) {
+        to = [from, from = to][0]; // swap
     }
 
-    let xCurrent = a;
-    let partLength = (b - a) / partition;
+    let xCurrent = from;
+    let partLength = (to - from) / partition;
     let tableFunction: TabulatedFunction = {nodes: [], values: []};
-    while (xCurrent <= b) {
+    while (xCurrent <= to) {
         tableFunction.nodes.push(xCurrent);
         tableFunction.values.push(evaluate(func, {x: xCurrent}));
         xCurrent += partLength;
@@ -145,7 +147,7 @@ function calculatePolynomial(tabFunc: TabulatedFunction): number[] {
 
 function calculateOmega(tabFunc: TabulatedFunction, x: number): number {
     let omega: number = 1;
-    tabFunc.nodes.map((xi: number) => {omega *= (x - xi)});
+    tabFunc.nodes.forEach((xi: number) => {omega *= (x - xi)});
     return abs(omega);
 }
 
@@ -199,12 +201,30 @@ function getNValuableRange(tabFunc: TabulatedFunction, epsilon: number, partitio
     return [errorTabFunc.nodes[0], errorTabFunc.nodes[errorTabFunc.nodes.length - 1]];
 }
 
+function tabulateMovedFunction(func: string, from: number, to: number, partition: number): TabulatedFunction {
+    if (to < from) {
+        to = [from, from = to][0]; // swap
+    }
+
+    let partLength = (to - from) / partition;
+    let xCurrent = from + partLength/2;
+
+    let tableFunction: TabulatedFunction = {nodes: [], values: []};
+    while (xCurrent <= to) {
+        tableFunction.nodes.push(xCurrent);
+        tableFunction.values.push(evaluate(func, {x: xCurrent}));
+        xCurrent += partLength;
+    }
+    return tableFunction;
+}
+
 // main function
 (() => {
     const leftBorder: number = 0;
     const rightBorder: number = 3.5;
     const partition: number = 4;
     const tabulatedFunction: TabulatedFunction = tabulateFunction(func, leftBorder, rightBorder, partition);
+    const movedTabulatedFunction: TabulatedFunction = tabulateMovedFunction(func, leftBorder, rightBorder, partition);
     const x = random(leftBorder, rightBorder);
     const lagrangeSolution: number = interpolateLagrange(tabulatedFunction, x);
     const newtonSolution: number = interpolateNewton(tabulatedFunction, x);
@@ -229,6 +249,8 @@ function getNValuableRange(tabFunc: TabulatedFunction, epsilon: number, partitio
     lagrangeAndNewtonFuncPlot(plotOptions(
         "function, Lagrange and Newton",
         plotElem("lagrange-and-newton-func-plot"),
+        {domain: [0, 3.5]},
+        {domain: [80, 120]},
         {
             // @ts-ignore
             fn: simplify(func, {pi: pi}).toString(),
@@ -253,22 +275,24 @@ function getNValuableRange(tabFunc: TabulatedFunction, epsilon: number, partitio
     errorFuncPlot(plotOptions(
         "Errors",
         plotElem("error-func-plot"),
+        {domain: [0, 3.5]},
+        {domain: [-0.00001, 0.00002]},
         {
             graphType: 'polyline',
             // @ts-ignore
-            fn: scope => calculateError(tabulatedFunction, scope.x, FuncFindingType.standard),
+            fn: scope => calculateError(movedTabulatedFunction, scope.x, FuncFindingType.standard),
+            range: [leftBorder, rightBorder]
+        }, /*{
+            graphType: 'polyline',
+            // @ts-ignore
+            fn: scope => calculateOmega(movedTabulatedFunction, scope.x, FuncFindingType.lagrange),
             range: [leftBorder, rightBorder]
         }, {
             graphType: 'polyline',
             // @ts-ignore
-            fn: scope => calculateError(tabulatedFunction, scope.x, FuncFindingType.lagrange),
+            fn: scope => calculateOmega(movedTabulatedFunction, scope.x, FuncFindingType.newton),
             range: [leftBorder, rightBorder]
-        }, {
-            graphType: 'polyline',
-            // @ts-ignore
-            fn: scope => calculateError(tabulatedFunction, scope.x, FuncFindingType.newton),
-            range: [leftBorder, rightBorder]
-        }
+        }*/
     ));
 
     let newRange = getNValuableRange(tabulatedFunction, EPS, partition);
