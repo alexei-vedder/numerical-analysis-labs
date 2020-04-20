@@ -5,7 +5,7 @@ window.d3 = d3;
 
 const func: string = "8*pi*(sqrt(12 + pi*x))";
 
-const EPS = 1e-4;
+// const EPS = 1e-4;
 
 const funcAndSplinesPlot = require("function-plot");
 //const splineErrorsPlot = require("function-plot");
@@ -74,14 +74,11 @@ function calculateLinearSpline(tabFunc: TabulatedFunction, x: number): number {
     return solution;
 }
 
-// TODO debug it
 function calculateCubicSplineCoeffs(tabFunc: TabulatedFunction): number[] {
     const n = tabFunc.nodes.length;
 
-    let k: number[] = [0, 0];
-    //k[0] = 0;
-    let c: number[] = [0, 0];
-    // c[0] = 0;
+    let k: number[] = new Array(n + 1).fill(0);
+    let c: number[] = new Array(n + 1).fill(0);
 
     for(let i = 2; i < n; ++i) {
         let j: number = i - 1;
@@ -92,8 +89,8 @@ function calculateCubicSplineCoeffs(tabFunc: TabulatedFunction): number[] {
         c[i] = a / r;
         k[i] = (3 * ((tabFunc.values[i] - tabFunc.values[j]) / a - (tabFunc.values[j] - tabFunc.values[m]) / b) - b * k[j]) / r;
     }
-    c[n - 1] = k[n - 1];
-    for (let i = n - 2; 2 <= i; --i) {
+    c[n] = k[n];
+    for (let i = n - 1; 2 <= i; --i) {
         c[i] = k[i] - c[i] * c[i + 1]
     }
     return c;
