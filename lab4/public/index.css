@@ -90,3 +90,26 @@ button:focus {
 .output__elem ._bold-font {
     font-weight: bold;
 }
+
+.func-description {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.func-description .func-color {
+    color: orange;
+}
+
+.func-description .linear-spline-color {
+    color: blue;
+}
+
+.func-description .cubic-spline-color {
+    color: red;
+}
+
+.func-description .parabolic-spline-color {
+    color: green;
+}
+
