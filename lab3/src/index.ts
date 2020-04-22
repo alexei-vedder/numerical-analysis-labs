@@ -183,7 +183,6 @@ function getNValuableRange(tabFunc: TabulatedFunction, epsilon: number, partitio
         values: new Array(tabFunc.values.length)
     };
     errorTabFunc.values.map((value: number, index: number) => calculateError(tabFunc, tabFunc.nodes[index]));
-    // let newRange: number[] = [];
     while (errorTabFunc.values.some((value) => epsilon <= value)) {
         let xCurrent = errorTabFunc.nodes[0] += 100*epsilon;
         errorTabFunc.nodes[errorTabFunc.nodes.length - 1] -= 100*epsilon;
@@ -282,17 +281,7 @@ function tabulateMovedFunction(func: string, from: number, to: number, partition
             // @ts-ignore
             fn: scope => calculateError(movedTabulatedFunction, scope.x, FuncFindingType.standard),
             range: [leftBorder, rightBorder]
-        }, /*{
-            graphType: 'polyline',
-            // @ts-ignore
-            fn: scope => calculateOmega(movedTabulatedFunction, scope.x, FuncFindingType.lagrange),
-            range: [leftBorder, rightBorder]
-        }, {
-            graphType: 'polyline',
-            // @ts-ignore
-            fn: scope => calculateOmega(movedTabulatedFunction, scope.x, FuncFindingType.newton),
-            range: [leftBorder, rightBorder]
-        }*/
+        }
     ));
 
     let newRange = getNValuableRange(tabulatedFunction, EPS, partition);
