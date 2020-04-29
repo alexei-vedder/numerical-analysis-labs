@@ -74,32 +74,32 @@ function tabulateMovedFunction(func: string, from: number, to: number, partition
     return tableFunction;
 }
 
-function calculateLinearSpline(tFunc: TabulatedFunction, x: number): number {
+function calculateLinearSpline(f: TabulatedFunction, x: number): number {
     let solution: number = 0;
-    for (let i = 0; i < tFunc.x.length; ++i) {
+    for (let i = 0; i < f.x.length; ++i) {
         let l: number = 1;
-        for (let j = 0; j < tFunc.x.length; ++j) {
+        for (let j = 0; j < f.x.length; ++j) {
             if (i !== j) {
-                l *= (x - tFunc.x[j]) / (tFunc.x[i] - tFunc.x[j])
+                l *= (x - f.x[j]) / (f.x[i] - f.x[j])
             }
         }
-        solution += (tFunc.y[i] * l);
+        solution += (f.y[i] * l);
     }
     return solution;
 }
 
-function calculateCubicSplineCoeffs(tFunc: TabulatedFunction): Coeffs {
-    const n = tFunc.x.length;
+function calculateCubicSplineCoeffs(f: TabulatedFunction): Coeffs {
+    const n = f.x.length;
     let b: number[] = new Array(n).fill(0);
     let c: number[] = new Array(n).fill(0);
     let d: number[] = new Array(n).fill(0);
     let h: number[] = new Array(n).fill(0);
     for (let k = 1; k < n; ++k) {
-        h[k] = tFunc.x[k] - tFunc.x[k-1];
+        h[k] = f.x[k] - f.x[k-1];
     }
     let l: number[] = new Array(n).fill(0);
     for (let k = 1; k < n; ++k) {
-        l[k] = (tFunc.y[k] - tFunc.y[k-1])/h[k];
+        l[k] = (f.y[k] - f.y[k-1])/h[k];
     }
     let delta: number[] = new Array(n).fill(0);
     delta[1] = -h[3]/(2*(h[3] + h[2]));
@@ -124,28 +124,28 @@ function calculateCubicSplineCoeffs(tFunc: TabulatedFunction): Coeffs {
     }
 }
 
-function calculateCubicSpline(tFunc: TabulatedFunction, x: number, coeffs: Coeffs): number {
-    const n = tFunc.x.length;
+function calculateCubicSpline(f: TabulatedFunction, x: number, coeffs: Coeffs): number {
+    const n = f.x.length;
     let b: number[] = coeffs.a;
     let c: number[] = coeffs.b;
     let d: number[] = coeffs.c;
-    let a = tFunc.y;
+    let a = f.y;
     let j = 0;
-    if (tFunc.x[n-2] < x) {
+    if (f.x[n-2] < x) {
         j = n - 1;
     } else {
         for (let k = 1; k < n-1; ++k) {
-            if (x <= tFunc.x[k]) {
+            if (x <= f.x[k]) {
                 j = k;
                 break;
             }
         }
     }
-    return a[j] + b[j] * (x - tFunc.x[j]) + c[j]*(x - tFunc.x[j])**2 + d[j]*(x - tFunc.x[j])**3;
+    return a[j] + b[j] * (x - f.x[j]) + c[j]*(x - f.x[j])**2 + d[j]*(x - f.x[j])**3;
 }
 
-function calculateParabolicSplineCoeffs(tFunc: TabulatedFunction): Coeffs {
-    const n: number = tFunc.x.length;
+function calculateParabolicSplineCoeffs(f: TabulatedFunction): Coeffs {
+    const n: number = f.x.length;
 
     let a: number[] = new Array(n).fill(0);
     let b: number[] = new Array(n).fill(0);
@@ -155,11 +155,11 @@ function calculateParabolicSplineCoeffs(tFunc: TabulatedFunction): Coeffs {
     let g: number[] = new Array(n).fill(0);
 
     for (let i = 1; i < n; ++i) {
-        h[i] = tFunc.x[i] - tFunc.x[i - 1];
+        h[i] = f.x[i] - f.x[i - 1];
     }
 
     for (let i = 1; i < n; ++i) {
-        g[i] = (tFunc.y[i - 1] - tFunc.y[i]) / h[i];
+        g[i] = (f.y[i - 1] - f.y[i]) / h[i];
     }
 
     c[n-1] = g[n-1] / h[n-1];
@@ -168,11 +168,11 @@ function calculateParabolicSplineCoeffs(tFunc: TabulatedFunction): Coeffs {
     }
 
     for (let i = n - 1; 1 <= i; --i) {
-        b[i] = ((tFunc.y[i] - tFunc.y[i - 1]) / h[i]) - h[i] * c[i];
+        b[i] = ((f.y[i] - f.y[i - 1]) / h[i]) - h[i] * c[i];
     }
 
     for (let i = 1; i < n; ++i) {
-        a[i] = tFunc.y[i - 1];
+        a[i] = f.y[i - 1];
     }
 
     return {
@@ -182,14 +182,14 @@ function calculateParabolicSplineCoeffs(tFunc: TabulatedFunction): Coeffs {
     }
 }
 
-function calculateParabolicSpline(tFunc: TabulatedFunction, x: number, coeffs: Coeffs): number {
-    let n = tFunc.x.length;
+function calculateParabolicSpline(f: TabulatedFunction, x: number, coeffs: Coeffs): number {
+    let n = f.x.length;
     let i = 1;
     // finding a near node number
-    while ((tFunc.x[i] < x) && (i !== n - 1)) {
+    while ((f.x[i] < x) && (i !== n - 1)) {
         ++i;
     }
-    return coeffs.a[i] + coeffs.b[i]*(x - tFunc.x[i - 1]) + coeffs.c[i] * (x - tFunc.x[i - 1])**2;
+    return coeffs.a[i] + coeffs.b[i]*(x - f.x[i - 1]) + coeffs.c[i] * (x - f.x[i - 1])**2;
 }
 
 // main function
