@@ -4,66 +4,13 @@
     font-family: Consolas;
 }
 
-.plot-pair-wrapper,
-.plot {
-    width: fit-content;
-    height: fit-content;
-}
-
 .input-output {
     display: flex;
     padding: 5px;
     flex-direction: column;
-    width: 350px;
+    width: 600px;
     height: 550px;
     overflow-y: scroll;
-}
-
-.input {
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    margin: 20px 0;
-}
-
-input {
-    margin: 10px 0;
-    padding-left: 8px;
-    border-radius: 8px;
-    font-family: Consolas;
-    transition-duration: 0.4s;
-}
-
-input:focus {
-    outline: none;
-    box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.37);
-    transform: scale(1.05);
-}
-
-button {
-    font-family: Consolas;
-    border-radius: 8px;
-    margin: 10px 0 0 25px;
-    width: 166px;
-    height: 30px;
-    transition-duration: 0.4s;
-}
-
-button:hover {
-    box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.37);
-    transform: scale(1.2);
-    cursor: pointer;
-}
-
-button:focus {
-    outline: none;
-}
-
-.output {
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    margin: 20px 0 0 0;
 }
 
 .output-block {
@@ -76,16 +23,4 @@ button:focus {
     border-radius: 5px;
     box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.37);
     cursor: pointer;
-}
-
-.output__elem {
-    min-height: 60px;
-}
-
-.output__elem ._large-font {
-    font-size: large;
-}
-
-.output__elem ._bold-font {
-    font-weight: bold;
 }
