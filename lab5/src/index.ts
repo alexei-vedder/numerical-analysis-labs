@@ -7,6 +7,20 @@ function pushToOutput(...records: any[]): void {
     lastOutputBlock.insertAdjacentHTML("beforeend", "<div class=\"output-block\">" + records.join('\n') + "</div>");
 }
 
+/*
+This method needs for checking if there are number of ranges is multiply of 4
+ */
+function correctStep(from: number, to: number, step: number): number {
+    let rangesNum = (to - from) / step;
+    let remainder = rangesNum % 4;
+    if (remainder === 0) {
+        return step;
+    } else {
+        rangesNum -= remainder;
+        return (to - from) / rangesNum;
+    }
+}
+
 function tabulateRange(from: number, to: number, step: number): number[] {
     if (to < from) {
         to = [from, from = to][0]; // swap
@@ -30,27 +44,6 @@ function calcTrapezia(func: Function, from: number, to: number, step: number): n
     return solution;
 }
 
-/*
-// another version of a Simpson method implementation
-function calcSimpson(func: Function, from: number, to: number, step: number) {
-    let i;
-    let n = ~~((to - from) / step);
-    let n2 = n * 2;
-    let h = (to - from) / n2;
-    let sum = func(from) + func(to);
-
-    for (i = 1; i < n2; i += 2) {
-        sum += 4 * func(from + i * h)
-    }
-
-    for (i = 2; i < n2 - 1; i += 2) {
-        sum += 2 * func(from + i * h)
-    }
-
-    return sum * h / 3
-}
-*/
-
 function calcSimpson(func: Function, from: number, to: number, step: number): number {
     let x: number[] = tabulateRange(from, to, step);
     let n: number = x.length - 1;
@@ -65,32 +58,33 @@ function calcSimpson(func: Function, from: number, to: number, step: number): nu
     return (step / 3) * (func(x[0]) + 2*series1 + 4*series2 + func(x[n]));
 }
 
-function calcNewtonLeibniz(func: Function, from: number, to: number): number {
-    const antiderivative: Function = (x: number) => evaluate("(2*(x^(3/2)) * (-2 + 3*log(x)))/9", {x: x});
+function calcNewtonLeibniz(antiderivative: Function, from: number, to: number): number {
     return antiderivative(to) - antiderivative(from);
 }
 
 // main function
 (() => {
     const func: Function = (x: number) => evaluate("sqrt(x)*log(x)", {x: x});
+    const antiderivative: Function = (x: number) => evaluate("(2*(x^(3/2)) * (-2 + 3*log(x)))/9", {x: x});
     const from: number = 1;
     const to: number = 3;
-    const step: number = .1
+    const step: number = correctStep(from, to, 0.1)
+    const doubleStep: number = correctStep(from, to, 0.1 * 2)
 
     const trapeziaSolutionH: number = calcTrapezia(func, from, to, step);
-    const trapeziaSolution2H: number = calcTrapezia(func, from, to, 2 * step);
+    const trapeziaSolution2H: number = calcTrapezia(func, from, to, doubleStep);
     const trapeziaError: number = abs(trapeziaSolutionH - trapeziaSolution2H) / 3;
     pushToOutput("Trapezia Solution with 'h' step: ", trapeziaSolutionH);
     pushToOutput("Trapezia Solution with '2h' step: ", trapeziaSolution2H);
     pushToOutput("Error: ", trapeziaError);
 
     const simpsonSolutionH: number = calcSimpson(func, from, to, step);
-    const simpsonSolution2H: number = calcSimpson(func, from, to, 2 * step);
+    const simpsonSolution2H: number = calcSimpson(func, from, to, doubleStep);
     const simpsonError: number = abs(simpsonSolutionH - simpsonSolution2H) / 15;
     pushToOutput("Simpson Solution with 'h' step:", simpsonSolutionH);
     pushToOutput("Simpson Solution with '2h' step:", simpsonSolution2H);
     pushToOutput("Error:", simpsonError);
 
-    const newtonLeibnizSolution: number = calcNewtonLeibniz(func, from, to);
+    const newtonLeibnizSolution: number = calcNewtonLeibniz(antiderivative, from, to);
     pushToOutput("Newton-Leibniz Solution:", newtonLeibnizSolution);
 })();
