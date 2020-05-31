@@ -1,0 +1,29 @@
+{
+  "name": "num-analysis-lab6",
+  "version": "1.0.0",
+  "dependencies": {
+    "@types/mathjs": "^6.0.5",
+    "@types/d3": "^5.7.2",
+    "mathjs": "^6.6.1",
+    "react-scripts": "^3.4.0",
+    "typescript": "^3.8.3",
+    "d3": "^3.5.17",
+    "function-plot": "^1.19.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

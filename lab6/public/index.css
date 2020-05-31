@@ -1,0 +1,60 @@
+.root {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-family: Consolas;
+}
+
+.plot-wrapper,
+.plot {
+    width: fit-content;
+    height: fit-content;
+}
+
+.table-wrapper {
+    display: flex;
+    padding: 5px;
+    flex-direction: column;
+    width: 600px;
+    height: 550px;
+    overflow-y: scroll;
+}
+
+.table__title {
+    text-align: center;
+}
+
+.table {
+    word-break: break-all;
+    transition-duration: 0.4s;
+    padding: 10px
+}
+
+.table__main {
+    width: -webkit-fill-available;
+}
+
+.table:hover {
+    border-radius: 5px;
+    box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.37);
+    cursor: pointer;
+}
+
+.func-description {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+.func-description .runge-kutta-color {
+    color: blue;
+}
+
+.func-description .euler-color {
+    color: red;
+}
+
+.func-description .precise-solution-color {
+    color: green;
+}
