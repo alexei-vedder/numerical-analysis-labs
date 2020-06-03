@@ -1,5 +1,5 @@
 import d3 from "d3";
-import {max} from "mathjs";
+import {abs, max} from "mathjs";
 
 window.d3 = d3;
 
@@ -25,7 +25,7 @@ function tabulateFunction(f: Function, from: number, to: number, partition: numb
     return tableFunction;
 }
 
-function getPoints(tf: TabulatedFunction): number[][] {
+function transformToPoints(tf: TabulatedFunction): number[][] {
     let points: number[][] = [];
     for (let i = 0; i < tf.x.length; ++i) {
         points.push([tf.x[i], tf.y[i]]);
@@ -33,16 +33,15 @@ function getPoints(tf: TabulatedFunction): number[][] {
     return points;
 }
 
-function findNextY(f: Function, x: number, y: number, h: number): number {
-    const k1 = f(x, y);
-    const k2 = f(x + h / 2, y + k1 * h / 2);
-    const k3 = f(x + h / 2, y + k2 * h / 2);
-    const k4 = f(x + h, y + k3 * h);
-    return y + (h / 6) * (k1 + 2 * k2 + 2 * k3 + k4);
+function pushToOutput(...records: any[]): void {
+    records.map((elem) => elem.toString());
+    let outputBlocks = document.getElementsByClassName("input-output");
+    let lastOutputBlock = outputBlocks[outputBlocks.length - 1];
+    lastOutputBlock.insertAdjacentHTML("beforeend", "<div class=\"output-block\">" + records.join('\n') + "</div>");
 }
 
 function generateTable(title: string, headers: any[], ...columns: any[]) {
-    let tables = document.getElementsByClassName("table-wrapper");
+    let tables = document.getElementsByClassName("input-output");
     let lastTable = tables[tables.length - 1];
     let tableBody = "";
     tableBody += "<tr>";
@@ -58,42 +57,76 @@ function generateTable(title: string, headers: any[], ...columns: any[]) {
         tableBody += "</tr>";
     }
     lastTable.insertAdjacentHTML("beforeend",
-        "<div class='table'><h3 class='table__title'>" + title + "</h3><table class='table__main'>" + tableBody + "</table></div>"
+        "<div class='table-block'><h3 class='table-block__title'>" + title + "</h3><table class='table-block__table'>" + tableBody + "</table></div>"
     );
+}
+
+function findNextY(f: Function, x: number, y: number, h: number): number {
+    const k1 = f(x, y);
+    const k2 = f(x + h / 2, y + k1 * h / 2);
+    const k3 = f(x + h / 2, y + k2 * h / 2);
+    const k4 = f(x + h, y + k3 * h);
+    return y + (h / 6) * (k1 + 2 * k2 + 2 * k3 + k4);
+}
+
+function tabulateRungeKutta(f: Function, x0: number, xn: number, y0: number, h: number): TabulatedFunction {
+    let rungeKutta: TabulatedFunction = {x: [], y: []};
+    rungeKutta.x[0] = x0;
+    rungeKutta.y[0] = y0;
+    const n = 1 + (xn - x0) / h;
+    for (let i = 0; i <= n - 2; ++i) {
+        rungeKutta.y[i + 1] = findNextY(f, rungeKutta.x[i], rungeKutta.y[i], h);
+        rungeKutta.x[i + 1] = rungeKutta.x[i] + h;
+    }
+    return rungeKutta;
+}
+
+function tabulateEuler(f: Function, x0: number, xn: number, y0: number, h: number): TabulatedFunction {
+    let euler: TabulatedFunction = {x: [], y: []};
+    for (let xCurrent = x0, yCurrent = y0; xCurrent <= xn + h / 2; xCurrent += h, yCurrent += h * f(xCurrent, yCurrent)) {
+        euler.x.push(xCurrent);
+        euler.y.push(yCurrent);
+    }
+    return euler;
+}
+
+function findDelta(singleStepFunc: TabulatedFunction, doubleStepFunc: TabulatedFunction): number {
+    let deltas: number[] = [];
+    for (let i = 0; i < doubleStepFunc.x.length; ++i) {
+        const areNodesEqual: boolean = abs(singleStepFunc.x[2*i] - doubleStepFunc.x[i]) < 1e-4;
+        if (areNodesEqual) {
+            deltas.push(abs(singleStepFunc.y[2*i] - doubleStepFunc.y[i]))
+        }
+    }
+    return max(deltas);
 }
 
 // main function
 (() => {
     const f: Function = (x: number, y: number) => (2 / (x ** 2)) - (y ** 2);
-    const y: Function = (x: number) => (4*(x**3) - 1) / (x*(1 + 2*(x**3)));
+    const y: Function = (x: number) => (4 * (x ** 3) - 1) / (x * (1 + 2 * (x ** 3)));
 
-    const h: number = 0.2;
+    const h: number = 0.05;
     const x0 = 1;
-    const xn = 3;
+    const xn = 2;
     const y0 = 1;
-    const n = 1 + (xn - x0) / h;
     const headers = ['x', 'y'];
 
-    let rungeKutta: TabulatedFunction = {x: [], y: []};
-    rungeKutta.x[0] = x0;
-    rungeKutta.y[0] = y0;
-    for (let i = 0; i <= n - 2; ++i) {
-        rungeKutta.y[i + 1] = findNextY(f, rungeKutta.x[i], rungeKutta.y[i], h);
-        rungeKutta.x[i + 1] = rungeKutta.x[i] + h;
-    }
-
+    let rungeKutta: TabulatedFunction = tabulateRungeKutta(f, x0, xn, y0, h);
     generateTable('Runge-Kutta', headers, rungeKutta.x, rungeKutta.y);
 
-    let euler: TabulatedFunction = {x: [], y: []};
-    for (let xCurrent = x0, yCurrent = y0; xCurrent <= xn + h/2; xCurrent += h, yCurrent += h * f(xCurrent, yCurrent)) {
-        euler.x.push(xCurrent);
-        euler.y.push(yCurrent);
-    }
+    let rungeKuttaDoubleH: TabulatedFunction = tabulateRungeKutta(f, x0, xn, y0, 2*h);
+    const rungeKuttaDelta: number = findDelta(rungeKutta, rungeKuttaDoubleH);
+    pushToOutput('&Delta;(Runge-Kutta) =', rungeKuttaDelta);
 
+    let euler: TabulatedFunction = tabulateEuler(f, x0, xn, y0, h);
     generateTable('Euler', headers, euler.x, euler.y);
 
-    let preciseSolution: TabulatedFunction = tabulateFunction(y, x0, xn, n-1);
+    let eulerDoubleH: TabulatedFunction = tabulateEuler(f, x0, xn, y0, 2*h);
+    const eulerDelta: number = findDelta(euler, eulerDoubleH);
+    pushToOutput('&Delta;(Euler) =', eulerDelta);
 
+    let preciseSolution: TabulatedFunction = tabulateFunction(y, x0, xn, (xn - x0) / h);
     generateTable('Precise solution', headers, preciseSolution.x, preciseSolution.y);
 
     plot({
@@ -102,11 +135,11 @@ function generateTable(title: string, headers: any[], ...columns: any[]) {
         xAxis: {domain: [0.6, 3.4]},
         yAxis: {domain: [-0.5, 2.5]},
         data: [{
-            points: getPoints(rungeKutta),
+            points: transformToPoints(rungeKutta),
             fnType: 'points',
             graphType: 'polyline'
         }, {
-            points: getPoints(euler),
+            points: transformToPoints(euler),
             fnType: 'points',
             graphType: 'polyline'
         }, {
@@ -115,5 +148,4 @@ function generateTable(title: string, headers: any[], ...columns: any[]) {
             range: [x0, xn]
         }]
     })
-
 })();
