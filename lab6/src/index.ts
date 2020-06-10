@@ -10,6 +10,20 @@ interface TabulatedFunction {
     y: number[];
 }
 
+/*
+This method needs for checking if there are number of ranges is multiply of 2
+*/
+function correctStep(step: number, from: number, to: number): number {
+    let rangesNum = (to - from) / step;
+    let remainder = rangesNum % 2;
+    if (remainder === 0) {
+        return step;
+    } else {
+        rangesNum -= remainder;
+        return (to - from) / rangesNum;
+    }
+}
+
 function tabulateFunction(f: Function, from: number, to: number, partition: number): TabulatedFunction {
     if (to < from) {
         to = [from, from = to][0]; // swap
@@ -43,12 +57,13 @@ function pushToOutput(...records: any[]): void {
 function generateTable(title: string, headers: any[], ...columns: any[]) {
     let tables = document.getElementsByClassName("input-output");
     let lastTable = tables[tables.length - 1];
+    let tableHeader = "";
     let tableBody = "";
-    tableBody += "<tr>";
+    tableHeader += "<tr>";
     for (let headerIndex = 0; headerIndex < headers.length; ++headerIndex) {
-        tableBody += "<th>" + headers[headerIndex] + "</th>"
+        tableHeader += "<th>" + headers[headerIndex] + "</th>"
     }
-    tableBody += "</tr>";
+    tableHeader += "</tr>";
     for (let rowIndex = 0; rowIndex < max(columns.map(column => column.length)); ++rowIndex) {
         tableBody += "<tr>";
         for (let columnIndex = 0; columnIndex < columns.length; ++columnIndex) {
@@ -57,7 +72,10 @@ function generateTable(title: string, headers: any[], ...columns: any[]) {
         tableBody += "</tr>";
     }
     lastTable.insertAdjacentHTML("beforeend",
-        "<div class='table-block'><h3 class='table-block__title'>" + title + "</h3><table class='table-block__table'>" + tableBody + "</table></div>"
+        "<div class='table-block'>" +
+        "<h3 class='table-block__title'>" + title + "</h3>" +
+        "<table class='table-block__table'>" + tableHeader + tableBody + "</table>" +
+        "</div>"
     );
 }
 
@@ -93,9 +111,9 @@ function tabulateEuler(f: Function, x0: number, xn: number, y0: number, h: numbe
 function findDelta(singleStepFunc: TabulatedFunction, doubleStepFunc: TabulatedFunction): number {
     let deltas: number[] = [];
     for (let i = 0; i < doubleStepFunc.x.length; ++i) {
-        const areNodesEqual: boolean = abs(singleStepFunc.x[2*i] - doubleStepFunc.x[i]) < 1e-4;
+        const areNodesEqual: boolean = abs(singleStepFunc.x[2 * i] - doubleStepFunc.x[i]) < 1e-4;
         if (areNodesEqual) {
-            deltas.push(abs(singleStepFunc.y[2*i] - doubleStepFunc.y[i]))
+            deltas.push(abs(singleStepFunc.y[2 * i] - doubleStepFunc.y[i]))
         }
     }
     return max(deltas);
@@ -106,23 +124,23 @@ function findDelta(singleStepFunc: TabulatedFunction, doubleStepFunc: TabulatedF
     const f: Function = (x: number, y: number) => (2 / (x ** 2)) - (y ** 2);
     const y: Function = (x: number) => (4 * (x ** 3) - 1) / (x * (1 + 2 * (x ** 3)));
 
-    const h: number = 0.05;
-    const x0 = 1;
-    const xn = 2;
-    const y0 = 1;
-    const headers = ['x', 'y'];
+    const x0: number = 1;
+    const xn: number = 2;
+    const y0: number = 1;
+    const h: number = correctStep(0.05, x0, xn);
+    const headers: string[] = ['x', 'y'];
 
     let rungeKutta: TabulatedFunction = tabulateRungeKutta(f, x0, xn, y0, h);
     generateTable('Runge-Kutta', headers, rungeKutta.x, rungeKutta.y);
 
-    let rungeKuttaDoubleH: TabulatedFunction = tabulateRungeKutta(f, x0, xn, y0, 2*h);
+    let rungeKuttaDoubleH: TabulatedFunction = tabulateRungeKutta(f, x0, xn, y0, 2 * h);
     const rungeKuttaDelta: number = findDelta(rungeKutta, rungeKuttaDoubleH);
     pushToOutput('&Delta;(Runge-Kutta) =', rungeKuttaDelta);
 
     let euler: TabulatedFunction = tabulateEuler(f, x0, xn, y0, h);
     generateTable('Euler', headers, euler.x, euler.y);
 
-    let eulerDoubleH: TabulatedFunction = tabulateEuler(f, x0, xn, y0, 2*h);
+    let eulerDoubleH: TabulatedFunction = tabulateEuler(f, x0, xn, y0, 2 * h);
     const eulerDelta: number = findDelta(euler, eulerDoubleH);
     pushToOutput('&Delta;(Euler) =', eulerDelta);
 
